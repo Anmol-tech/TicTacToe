@@ -98,8 +98,8 @@ def check_win():
             winner = board[0][col]
             pg.draw.line(screen,
                          (255, 0, 0),
-                         (0, (col + 1) * height / 3 - height / 6),
-                         (width, (col + 1) * height / 3 - height / 6),
+                         ((col + 1) * width / 3 - width / 6, 0),
+                         ((col + 1) * width / 3 - width / 6, height),
                          4)
             break
 
