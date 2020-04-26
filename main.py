@@ -1,7 +1,7 @@
 import pygame as pg
 import sys, time
 
-# from pygame.locals import *
+from pygame.locals import *
 
 # Global Variables
 winner = None
@@ -21,7 +21,7 @@ Clock = pg.time.Clock()
 screen = pg.display.set_mode((width, height + 100), 0, 32)
 pg.display.set_caption("Tic Tac Toe")
 
-opening = pg.image.load("img/red.jpg")
+opening = pg.image.load("img/red.png")
 x_img = pg.image.load("img/cross.png")
 o_img = pg.image.load("img/zero.png")
 
@@ -73,8 +73,8 @@ def draw_status():
     text = font.render(message, 1, white)
 
     screen.fill((0, 0, 0), (0, 400, 500, 100))
-    text_rect = text.get_rect(centre=(width / 2, 500 - 50))
-    screen.blit(text, text_rect)
+    # text_rect = text.get_rect()
+    screen.blit(text, ((width / 2), (500 - 50)))
     pg.display.update()
 
 
@@ -91,9 +91,10 @@ def check_win():
                          (width, (row + 1) * height / 3 - height / 6),
                          4)
             break
+
     for col in range(0, 3):
         if ((board[0][col]) == board[1][col] == board[2][col]) and (board[0][col] is not None):
-            # Row won
+            # col won
             winner = board[0][col]
             pg.draw.line(screen,
                          (255, 0, 0),
@@ -119,3 +120,86 @@ def check_win():
     if all([all(row) for row in board]) and winner is None:
         draw = True
     draw_status()
+
+
+def drawXO(row, col):
+    global board, XO
+    if row == 1:
+        posx = 30
+    if row == 2:
+        posx = width / 3 + 30
+    if row == 3:
+        posx = width / 3 * 2 + 30
+
+    if col == 1:
+        posy = 30
+    if col == 2:
+        posy = height / 3 + 30
+    if col == 3:
+        posy = height / 3 * 2 + 30
+    board[row - 1][col - 1] = XO
+    if XO == 'x':
+        screen.blit(x_img, (posy, posx))
+        XO = "o"
+    else:
+        screen.blit(o_img, (posy, posx))
+        XO = "x"
+    pg.display.update()
+    print(posx, posy)
+    print(board)
+
+
+def userClick():
+    x, y = pg.mouse.get_pos()
+
+    # Declaring selected col
+    if x < width / 3:
+        col = 1
+    elif x < width / 3 * 2:
+        col = 2
+    elif x < width:
+        col = 3
+    else:
+        col = None
+
+    # declaring selected row
+    if y < height / 3:
+        row = 1
+    elif y < height / 3 * 2:
+        row = 2
+    elif y < height:
+        row = 3
+    else:
+        row = None
+
+    print(row, col)
+
+    if row and col and board[row - 1][col - 1] is None:
+        global XO
+
+        drawXO(row, col)
+        check_win()
+
+
+def resetGame():
+    global board, winner, XO, draw
+    time.sleep(3)
+    XO = 'x'
+    draw = False
+    gameOpening()
+    winner = None
+    board = [[None] * 3, [None] * 3, [None] * 3]
+
+
+gameOpening()
+while True:
+    for event in pg.event.get():
+        if event.type == QUIT:
+            pg.quit()
+            sys.exit()
+        elif event.type is MOUSEBUTTONDOWN:
+            userClick()
+            if winner or draw:
+                resetGame()
+    pg.display.update()
+    Clock.tick(fps)
